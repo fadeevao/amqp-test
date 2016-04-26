@@ -16,3 +16,6 @@
 *.war
 *.ear
 
+*/target/**
+
+

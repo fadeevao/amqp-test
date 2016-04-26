@@ -7,6 +7,13 @@ public class JourneyDirections {
 
     private String to;
 
+    public JourneyDirections(String from, String to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    public JourneyDirections() {}
+
     public String getFrom() {
         return from;
     }
