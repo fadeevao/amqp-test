@@ -8,6 +8,9 @@ import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,6 +49,12 @@ public class QueueConfiguration {
     @Bean
     public Queue myQueue() {
         return new Queue("queue");
+    }
+
+    @Bean
+    public MessageConverter messageConverter() {
+        MessageConverter converter = new Jackson2JsonMessageConverter();
+        return converter;
     }
 
 }

@@ -1,7 +1,17 @@
 package test_amqp;
 
-import org.joda.time.DateTime;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.LocalDate;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,7 +20,7 @@ public class TicketRequestBuilderTest {
     @Test
     public void testBuildTicketRequest() {
         TicketType type = TicketType.RETURN;
-        DateTime dateTime = new DateTime(2015,11,1,10,10);
+        Date dateTime = new Date();
         boolean  student = true;
         boolean adult = true;
         Integer numberOfTickets = 5;

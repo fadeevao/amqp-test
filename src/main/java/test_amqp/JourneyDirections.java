@@ -1,10 +1,14 @@
 package test_amqp;
 
 
+import javax.validation.constraints.NotNull;
+
 public class JourneyDirections {
 
+    @NotNull(message = "Journey starting point can't be empty")
     private String from;
 
+    @NotNull(message = "Journey destination must be provided")
     private String to;
 
     public JourneyDirections(String from, String to) {

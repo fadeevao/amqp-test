@@ -1,30 +1,38 @@
 package test_amqp;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 
 public class TicketRequest implements Serializable{
 
+    @NotNull
     private TicketType ticketType;
 
-    private DateTime dateTime;
+    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private Date dateTime;
 
     private boolean isStudentTicket;
 
     private boolean isAdultTicket;
 
+    @NotNull
+    @Size(min=1)
     private Integer numberOfTickets;
 
-    private JourneyDirections journeyDirections;
+    public JourneyDirections getJourneyDirections() {
+        return journeyDirections;
+    }
 
-    public TicketRequest(TicketType ticketType, DateTime dateTime, boolean isStudentTicket, boolean adult, Integer numberOfTickets, JourneyDirections journeyDirections) {
-        this.ticketType = ticketType;
-        this.dateTime = dateTime;
-        this.isStudentTicket = isStudentTicket;
-        this.isAdultTicket = adult;
-        this.numberOfTickets = numberOfTickets;
+    public void setJourneyDirections(JourneyDirections journeyDirections) {
         this.journeyDirections = journeyDirections;
     }
 
@@ -36,12 +44,12 @@ public class TicketRequest implements Serializable{
         this.numberOfTickets = numberOfTickets;
     }
 
-    public DateTime getDateTime() {
-        return dateTime;
+    public boolean isAdultTicket() {
+        return isAdultTicket;
     }
 
-    public void setDateTime(DateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setAdultTicket(boolean adultTicket) {
+        isAdultTicket = adultTicket;
     }
 
     public boolean isStudentTicket() {
@@ -49,23 +57,15 @@ public class TicketRequest implements Serializable{
     }
 
     public void setStudentTicket(boolean studentTicket) {
-        this.isStudentTicket = studentTicket;
+        isStudentTicket = studentTicket;
     }
 
-    public boolean isAdultTicket() {
-        return isAdultTicket;
+    public Date getDateTime() {
+        return dateTime;
     }
 
-    public void setAdultTicket(boolean adultTicket) {
-        this.isAdultTicket = adultTicket;
-    }
-
-    public JourneyDirections getJourneyDirections() {
-        return journeyDirections;
-    }
-
-    public void setJourneyDirections(JourneyDirections journeyDirections) {
-        this.journeyDirections = journeyDirections;
+    public void setDateTime(Date dateTime) {
+        this.dateTime = dateTime;
     }
 
     public TicketType getTicketType() {
@@ -76,6 +76,23 @@ public class TicketRequest implements Serializable{
         this.ticketType = ticketType;
     }
 
+    @NotNull
+
+    @Valid
+    private JourneyDirections journeyDirections;
+
+    public TicketRequest(TicketType ticketType, Date dateTime, boolean isStudentTicket, boolean adult, Integer numberOfTickets, JourneyDirections journeyDirections) {
+        this.ticketType = ticketType;
+        this.dateTime = dateTime;
+        this.isStudentTicket = isStudentTicket;
+        this.isAdultTicket = adult;
+        this.numberOfTickets = numberOfTickets;
+        this.journeyDirections = journeyDirections;
+    }
+
+    public TicketRequest() {}
+
+
     @Override
     public String toString() {
         return ticketType.description + "Ticket Request from " + journeyDirections.getFrom() + " to " + journeyDirections.getTo();
@@ -84,7 +101,7 @@ public class TicketRequest implements Serializable{
     public static class TicketRequestBuilder {
         private TicketType ticketType;
 
-        private DateTime dateTime;
+        private Date dateTime;
 
         private boolean student;
 
@@ -99,7 +116,7 @@ public class TicketRequest implements Serializable{
             return this;
         }
 
-        public TicketRequestBuilder withDateTime(DateTime dateTime) {
+        public TicketRequestBuilder withDateTime(Date dateTime) {
             this.dateTime = dateTime;
             return this;
         }
