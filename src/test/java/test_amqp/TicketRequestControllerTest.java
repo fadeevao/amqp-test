@@ -17,10 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -61,10 +58,9 @@ public class TicketRequestControllerTest {
     }
 
     private String readFile() {
-
         FileInputStream fisTargetFile = null;
         try {
-            fisTargetFile = new FileInputStream(new File("/home/olga/IntellijProjects/amqp-test/src/test/java/test_amqp/ValidTicketRequest.json"));
+            fisTargetFile = new FileInputStream(new File("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/ValidTicketRequest.json"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

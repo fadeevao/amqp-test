@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
+@EnableWebMvc
 public class TicketRequestController {
     Logger logger = Logger.getLogger(TicketRequestController.class);
 
@@ -29,6 +31,7 @@ public class TicketRequestController {
         template.send(buildMessage(ticketRequest));
         return new ResponseEntity(HttpStatus.OK);
     }
+
 
     private Message buildMessage(TicketRequest request) {
         MessageProperties properties = new MessageProperties();
