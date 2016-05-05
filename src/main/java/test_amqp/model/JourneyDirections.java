@@ -1,4 +1,4 @@
-package test_amqp;
+package test_amqp.model;
 
 
 import javax.validation.constraints.NotNull;

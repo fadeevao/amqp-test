@@ -1,4 +1,4 @@
-package test_amqp;
+package test_amqp.queue;
 
 import org.apache.log4j.Logger;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -8,6 +8,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import test_amqp.api.TicketRequestController;
+import test_amqp.model.TicketRequest;
 
 @EnableRabbit
 @Component

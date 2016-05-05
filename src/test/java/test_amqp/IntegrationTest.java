@@ -1,5 +1,6 @@
 package test_amqp;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import test_amqp.api.TicketRequestController;
+import test_amqp.config.QueueConfiguration;
 
 import java.io.*;
 
@@ -27,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TicketRequestController.class, QueueConfiguration.class})
 @WebAppConfiguration
-public class TicketRequestControllerTest {
+public class IntegrationTest {
 
     @Mock
     RabbitTemplate template;
@@ -49,29 +52,16 @@ public class TicketRequestControllerTest {
 
     @Test
     public void testStatusOkIsReturned() throws Exception {
-        MvcResult result = this.mockMvc.perform(
+        MvcResult result = mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(readFile()))
+                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/validModel/ValidTicketRequest.json")))
                 .andExpect(status().isOk())
                 .andReturn();
     }
 
-    private String readFile() {
-        FileInputStream fisTargetFile = null;
-        try {
-            fisTargetFile = new FileInputStream(new File("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/ValidTicketRequest.json"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        String json = "";
-        try {
-            json = org.apache.commons.io.IOUtils.toString(fisTargetFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return json;
+    private String withFile(String filePath) throws IOException {
+        return FileUtils.readFileToString(new File(filePath));
     }
 
 }

@@ -1,16 +1,10 @@
 package test_amqp;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.LocalDate;
 import org.junit.Test;
+import test_amqp.model.JourneyDirections;
+import test_amqp.model.TicketRequest;
+import test_amqp.model.TicketType;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;

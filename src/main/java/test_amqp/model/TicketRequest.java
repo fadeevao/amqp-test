@@ -1,16 +1,16 @@
-package test_amqp;
+package test_amqp.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TicketRequest implements Serializable{
 
     @NotNull
@@ -25,8 +25,12 @@ public class TicketRequest implements Serializable{
     private boolean isAdultTicket;
 
     @NotNull
-    @Size(min=1)
+    @Min(1)
     private Integer numberOfTickets;
+
+    @NotNull
+    @Valid
+    private JourneyDirections journeyDirections;
 
     public JourneyDirections getJourneyDirections() {
         return journeyDirections;
@@ -76,11 +80,6 @@ public class TicketRequest implements Serializable{
         this.ticketType = ticketType;
     }
 
-    @NotNull
-
-    @Valid
-    private JourneyDirections journeyDirections;
-
     public TicketRequest(TicketType ticketType, Date dateTime, boolean isStudentTicket, boolean adult, Integer numberOfTickets, JourneyDirections journeyDirections) {
         this.ticketType = ticketType;
         this.dateTime = dateTime;
@@ -95,7 +94,11 @@ public class TicketRequest implements Serializable{
 
     @Override
     public String toString() {
-        return ticketType.description + "Ticket Request from " + journeyDirections.getFrom() + " to " + journeyDirections.getTo();
+        if (ticketType != null && journeyDirections != null) {
+            return ticketType.description + "Ticket Request from " + journeyDirections.getFrom() + " to " + journeyDirections.getTo();
+        } else {
+            return "Ticket request";
+        }
     }
 
     public static class TicketRequestBuilder {

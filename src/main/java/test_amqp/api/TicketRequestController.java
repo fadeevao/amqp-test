@@ -1,4 +1,4 @@
-package test_amqp;
+package test_amqp.api;
 
 import org.apache.log4j.Logger;
 import org.springframework.amqp.core.Message;
@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import test_amqp.model.TicketRequest;
+
+import javax.validation.Valid;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -26,7 +29,7 @@ public class TicketRequestController {
 
 
     @RequestMapping(value = "/ticket", method = POST, consumes = "application/json")
-    public @ResponseBody  ResponseEntity receiveTicketRequest(@RequestBody TicketRequest ticketRequest) {
+    public @ResponseBody  ResponseEntity receiveTicketRequest(@Valid @RequestBody TicketRequest ticketRequest) {
         logger.info("Received a ticket request" + ticketRequest.toString());
         template.send(buildMessage(ticketRequest));
         return new ResponseEntity(HttpStatus.OK);

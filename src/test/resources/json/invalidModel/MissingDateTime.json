@@ -1,0 +1,10 @@
+{
+  "ticketType": "RETURN",
+  "numberOfTickets": "5",
+  "journeyDirections": {
+    "from": "Riga",
+    "to": "London"
+  },
+  "adultTicket": true,
+  "studentTicket": true
+}
