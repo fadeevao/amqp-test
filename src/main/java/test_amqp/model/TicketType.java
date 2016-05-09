@@ -10,6 +10,4 @@ public enum TicketType {
      TicketType(String description) {
         this.description = description;
     }
-
-
 }
