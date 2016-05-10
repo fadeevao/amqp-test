@@ -61,6 +61,11 @@ public class Ticket implements Serializable{
         this.ticketType = ticketType;
     }
 
+    @Override
+    public String toString() {
+        return "Ticket with ticket type: " + ticketType.toString() + ", journey directions: " + journeyDirections.toString();
+    }
+
     public static class TicketBuilder {
         private BigDecimal totalPrice;
 

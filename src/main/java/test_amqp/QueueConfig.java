@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,19 +33,21 @@ public class QueueConfig {
 
     @Bean
     public Queue queue() {
-        Queue queue =  new Queue("queue");
-
-        return queue;
+        return new Queue("queue");
     }
 
     @Bean
     public DirectExchange directExchange() {
-        DirectExchange exchange =  new DirectExchange("exchange",false, false);
-        return exchange;
+        return new DirectExchange("exchange",false, false);
     }
 
     @Bean
     public Binding bindQueue() {
         return BindingBuilder.bind(queue()).to(directExchange()).with("routing.key");
+    }
+
+    @Bean
+    public MessageConverter messageConverter() {
+        return rabbitTemplate().getMessageConverter();
     }
 }

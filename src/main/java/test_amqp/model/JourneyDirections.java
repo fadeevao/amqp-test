@@ -34,4 +34,8 @@ public class JourneyDirections {
         to = directionTo;
     }
 
+    @Override
+    public String toString() {
+        return "to: " + to + ", from: " + from;
+    }
 }
