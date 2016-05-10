@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import test_amqp.api.TicketRequestController;
-import test_amqp.config.QueueConfiguration;
 
 import java.io.*;
 
@@ -28,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TicketRequestController.class, QueueConfiguration.class})
+@ContextConfiguration(classes = {TicketRequestController.class})
 @WebAppConfiguration
 public class TicketRequestControllerValidationTest {
 
