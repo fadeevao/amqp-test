@@ -2,10 +2,11 @@ package test_amqp.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @JsonSerialize
-public class Ticket {
+public class Ticket implements Serializable{
 
     private BigDecimal totalPrice;
 

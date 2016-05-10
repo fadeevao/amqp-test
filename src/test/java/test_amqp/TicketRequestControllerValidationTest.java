@@ -19,7 +19,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import test_amqp.api.TicketRequestController;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TicketRequestController.class})
+@ContextConfiguration(classes = {TicketRequestController.class, TicketDistributionService.class, QueueConfig.class})
 @WebAppConfiguration
 public class TicketRequestControllerValidationTest {
 
