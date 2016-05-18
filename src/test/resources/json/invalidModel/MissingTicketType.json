@@ -2,8 +2,8 @@
   "dateTime": "2016-05-01 20:46",
   "numberOfTickets": "5",
   "journeyDirections": {
-    "from": "Riga",
-    "to": "London"
+    "from": "BRIGHTON",
+    "to": "HOVE"
   },
   "adultTicket": true,
   "studentTicket": true

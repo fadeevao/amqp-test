@@ -1,6 +1,7 @@
 package test_amqp;
 
 import org.junit.Test;
+import test_amqp.model.Direction;
 import test_amqp.model.JourneyDirections;
 import test_amqp.model.TicketRequest;
 import test_amqp.model.TicketType;
@@ -18,7 +19,7 @@ public class TicketRequestBuilderTest {
         boolean  student = true;
         boolean adult = true;
         Integer numberOfTickets = 5;
-        JourneyDirections journeyDirections = new JourneyDirections("Riga", "London");
+        JourneyDirections journeyDirections = new JourneyDirections(Direction.BEDFORD, Direction.HOVE);
 
         TicketRequest ticketRequest = new TicketRequest.TicketRequestBuilder().withTicketType(type)
                 .withDateTime(dateTime).withStudentOption(student)

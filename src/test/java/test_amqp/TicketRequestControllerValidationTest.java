@@ -1,6 +1,6 @@
 package test_amqp;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,12 +14,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import test_amqp.api.TicketRequestController;
 
-import java.io.File;
 import java.io.IOException;
 
 import static org.mockito.Matchers.any;
@@ -52,67 +50,66 @@ public class TicketRequestControllerValidationTest {
 
     @Test
     public void testBadRequestIsReturnedWhenTicketTypeIsMissing() throws Exception {
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/invalidModel/MissingTicketType.json")))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+                        .content(withContent("json/invalidModel/MissingTicketType.json")))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testBadRequestIsReturnedWhenDateTimeIsMissing() throws Exception {
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/invalidModel/MissingDateTime.json")))
+                        .content(withContent("json/invalidModel/MissingDateTime.json")))
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
     @Test
     public void testBadRequestIsReturnedWhenDateTimeFormatIsWrong() throws Exception {
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/invalidModel/DateTimeWrongFormat.json")))
+                        .content(withContent("json/invalidModel/DateTimeWrongFormat.json")))
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
     @Test
     public void testBadRequestIsReturnedWhenNumberOfTicketsIsMissing() throws Exception {
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/invalidModel/NumberOfTicketsIsZero.json")))
+                        .content(withContent("json/invalidModel/NumberOfTicketsIsZero.json")))
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
     @Test
     public void testBadRequestIsReturnedWhenJourneyDirectionsIsMissing() throws Exception {
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/invalidModel/JourneyDirectionsMissing.json")))
+                        .content(withContent("json/invalidModel/JourneyDirectionsMissing.json")))
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
     @Test
     public void testBadRequestIsReturnedWhenJourneyDirectionToIsMissing() throws Exception {
-        MvcResult result = mockMvc.perform(
+        mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withFile("/home/olga/IntellijProjects/amqp-test/src/test/resources/json/invalidModel/ToDirectionMissing.json")))
+                        .content(withContent("json/invalidModel/ToDirectionMissing.json")))
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
 
-    private String withFile(String filePath) throws IOException {
-        return FileUtils.readFileToString(new File(filePath));
+    private String withContent(String filePath) throws IOException {
+        return IOUtils.toString(getClass().getClassLoader().getResourceAsStream(filePath));
     }
 
 }

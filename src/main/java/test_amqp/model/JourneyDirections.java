@@ -6,36 +6,36 @@ import javax.validation.constraints.NotNull;
 public class JourneyDirections {
 
     @NotNull(message = "Journey starting point can't be empty")
-    private String from;
+    private Direction from;
 
     @NotNull(message = "Journey destination must be provided")
-    private String to;
+    private Direction to;
 
-    public JourneyDirections(String from, String to) {
+    public JourneyDirections(Direction from, Direction to) {
         this.from = from;
         this.to = to;
     }
 
     public JourneyDirections() {}
 
-    public String getFrom() {
+    public Direction getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
+    public void setFrom(Direction from) {
         this.from = from;
     }
 
-    public String getTo() {
+    public Direction getTo() {
         return to;
     }
 
-    public void setTo(String directionTo) {
+    public void setTo(Direction directionTo) {
         to = directionTo;
     }
 
     @Override
     public String toString() {
-        return "to: " + to + ", from: " + from;
+        return "to: " + String.valueOf(to) + ", from: " + String.valueOf(from);
     }
 }
