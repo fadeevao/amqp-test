@@ -39,11 +39,13 @@ public class TicketRequestController {
     public @ResponseBody  ResponseEntity receiveTicketRequest(@Valid @RequestBody TicketRequest ticketRequest) {
         logger.info("Received a ticket request" + ticketRequest.toString());
         Message message = rabbitTemplate.sendAndReceive(MessageHelper.buildMessage(ticketRequest, messageConverter));
+        Ticket ticket = null;
         if (message != null) {
-            Ticket ticket = (Ticket) messageConverter.fromMessage(message);
-            logger.info("Got a response from ticket processor: " + ticket);
+             ticket = (Ticket) messageConverter.fromMessage(message);
+        } else {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(ticket, HttpStatus.OK);
 
     }
 

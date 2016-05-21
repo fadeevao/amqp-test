@@ -1,6 +1,7 @@
 package test_amqp;
 
 
+import org.springframework.stereotype.Component;
 import test_amqp.model.Direction;
 
 import java.math.BigDecimal;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class DistanceCalculator {
 
 

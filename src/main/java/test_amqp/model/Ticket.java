@@ -12,18 +12,12 @@ public class Ticket implements Serializable{
 
     private JourneyDirections journeyDirections;
 
-    private BigDecimal discount;
-
     private TicketType ticketType;
 
-    public Ticket(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType) {
-        this(totalPrice, journeyDirections, null, ticketType);
-    }
 
-    public Ticket(BigDecimal totalPrice, JourneyDirections journeyDirections, BigDecimal discount, TicketType ticketType) {
+    public Ticket(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType) {
         this.totalPrice = totalPrice;
         this.journeyDirections = journeyDirections;
-        this.discount = discount;
         this.ticketType = ticketType;
     }
 
@@ -45,14 +39,6 @@ public class Ticket implements Serializable{
         this.journeyDirections = journeyDirections;
     }
 
-    public BigDecimal getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(BigDecimal discount) {
-        this.discount = discount;
-    }
-
     public TicketType getTicketType() {
         return ticketType;
     }
@@ -71,8 +57,6 @@ public class Ticket implements Serializable{
 
         private JourneyDirections journeyDirections;
 
-        private BigDecimal discount;
-
         private TicketType ticketType;
 
         public TicketBuilder withTotalPrice(BigDecimal totalPrice) {
@@ -85,10 +69,6 @@ public class Ticket implements Serializable{
             return this;
         }
 
-        public TicketBuilder withDiscount(BigDecimal discount) {
-            this.discount = discount;
-            return this;
-        }
 
         public TicketBuilder withTicketType(TicketType ticketType) {
             this.ticketType = ticketType;
@@ -96,7 +76,7 @@ public class Ticket implements Serializable{
         }
 
         public Ticket build() {
-            return new Ticket(totalPrice, journeyDirections, discount, ticketType);
+            return new Ticket(totalPrice, journeyDirections, ticketType);
         }
     }
 }

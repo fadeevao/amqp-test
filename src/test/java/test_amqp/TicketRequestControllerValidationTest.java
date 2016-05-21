@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TicketRequestController.class, TicketDistributionService.class, QueueConfig.class})
+@ContextConfiguration(classes = {TicketRequestController.class, TicketDistributionService.class, QueueConfig.class, DistanceCalculator.class})
 @WebAppConfiguration
 public class TicketRequestControllerValidationTest {
 
