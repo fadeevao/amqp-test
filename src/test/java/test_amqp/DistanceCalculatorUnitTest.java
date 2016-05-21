@@ -13,10 +13,10 @@ public class DistanceCalculatorUnitTest {
     DistanceCalculator distanceCalculator = new DistanceCalculator();
     @Test
     public void testDistanceWhenToIsReachableDirectly() {
-        assertEquals(distanceCalculator.calculateDistance(BRIGHTON, HOVE), new BigDecimal(10));
-        assertEquals(distanceCalculator.calculateDistance(HOVE, BRIGHTON), new BigDecimal(10));
-        assertEquals(distanceCalculator.calculateDistance(BRIGHTON, GATWICK_AIRPORT), new BigDecimal(100));
-        assertEquals(distanceCalculator.calculateDistance(HOVE, SHOREHAM_BY_SEA), new BigDecimal(12));
+        assertEquals( new BigDecimal(10), distanceCalculator.calculateDistance(BRIGHTON, HOVE));
+        assertEquals( new BigDecimal(10), distanceCalculator.calculateDistance(HOVE, BRIGHTON));
+        assertEquals(new BigDecimal(100), distanceCalculator.calculateDistance(BRIGHTON, GATWICK_AIRPORT));
+        assertEquals(new BigDecimal(12), distanceCalculator.calculateDistance(HOVE, SHOREHAM_BY_SEA));
     }
 
     @Test
