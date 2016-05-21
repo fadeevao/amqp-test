@@ -1,27 +1,36 @@
 package test_amqp.model;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Created by olga on 18/05/16.
- */
 public enum Direction {
     BRIGHTON,
     GATWICK_AIRPORT,
     LONDON_VICTORIA,
-    BEDFORD,
     HOVE,
     WORTHING,
     SHOREHAM_BY_SEA;
 
-    public Set<Direction> reachableDirections = new HashSet<Direction>();
+    public Map<Direction, BigDecimal> reachableDirections = new HashMap<Direction, BigDecimal>();
+
+    public boolean visited;
 
     static {
-        BRIGHTON.reachableDirections.addAll(Arrays.asList(GATWICK_AIRPORT, LONDON_VICTORIA, BEDFORD, HOVE,
-                WORTHING, SHOREHAM_BY_SEA));
-        SHOREHAM_BY_SEA.reachableDirections.addAll(Arrays.asList(WORTHING, BRIGHTON));
-        WORTHING.reachableDirections.addAll(Arrays.asList(SHOREHAM_BY_SEA, BRIGHTON));
+
+        BRIGHTON.reachableDirections.put(GATWICK_AIRPORT, new BigDecimal(100));
+        GATWICK_AIRPORT.reachableDirections.put(BRIGHTON, new BigDecimal(100));
+
+        BRIGHTON.reachableDirections.put(HOVE, new BigDecimal(10));
+        HOVE.reachableDirections.put(BRIGHTON, new BigDecimal(10));
+
+        HOVE.reachableDirections.put(SHOREHAM_BY_SEA, new BigDecimal(12));
+        SHOREHAM_BY_SEA.reachableDirections.put(HOVE, new BigDecimal(12));
+
+        SHOREHAM_BY_SEA.reachableDirections.put(WORTHING, new BigDecimal(18));
+        WORTHING.reachableDirections.put(SHOREHAM_BY_SEA, new BigDecimal(18));
+
+        GATWICK_AIRPORT.reachableDirections.put(LONDON_VICTORIA, new BigDecimal(200));
+        LONDON_VICTORIA.reachableDirections.put(GATWICK_AIRPORT, new BigDecimal(200));
     }
 }
