@@ -14,17 +14,23 @@ public class TicketDistributionService {
     @Autowired
     private DistanceCalculator distanceCalculator;
 
+    public TicketDistributionService(DistanceCalculator distanceCalculator) {
+        this.distanceCalculator = distanceCalculator;
+    }
+
+    public TicketDistributionService() {}
+
 
     public Ticket processTicketRequest(TicketRequest ticketRequest){
         return new Ticket.TicketBuilder().withJourneyDirections(ticketRequest.getJourneyDirections())
                 .withTicketType(ticketRequest.getTicketType())
-                .withTotalPrice(calculatePrice(ticketRequest.getJourneyDirections(), ticketRequest.isStudentTicket()))
+                .withTotalPrice(calculatePrice(ticketRequest.getJourneyDirections(), ticketRequest.isStudentTicket(),  ticketRequest.getNumberOfTickets()))
                 .build();
     }
 
 
-    private BigDecimal calculatePrice(JourneyDirections journeyDirections, boolean studentTicket) {
+    private BigDecimal calculatePrice(JourneyDirections journeyDirections, boolean studentTicket, int numberOfTickets) {
         BigDecimal distance = distanceCalculator.calculateDistance(journeyDirections.getFrom(), journeyDirections.getTo());
-        return PriceCalculator.calculatePricePerDistance(distance, studentTicket);
+        return PriceCalculator.calculatePricePerDistanceAndNumberofTickets(distance, studentTicket, numberOfTickets);
     }
 }

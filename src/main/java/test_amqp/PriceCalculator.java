@@ -7,11 +7,12 @@ public class PriceCalculator {
 
     private static final BigDecimal STUDENT_DISCOUNT = new BigDecimal("0.2");
 
-    public static BigDecimal calculatePricePerDistance(BigDecimal distance, boolean studentPrice) {
-        BigDecimal standardPrice = distance.multiply(PRICE_PER_KM);
+    public static BigDecimal calculatePricePerDistanceAndNumberofTickets(BigDecimal distance, boolean studentPrice, int numberOfTickets) {
+        BigDecimal standardPricePerOneTicket = distance.multiply(PRICE_PER_KM);
+        BigDecimal totalPrice = standardPricePerOneTicket.multiply(BigDecimal.valueOf(numberOfTickets));
         if (studentPrice) {
-            return standardPrice.subtract(standardPrice.multiply(STUDENT_DISCOUNT));
+            return totalPrice.subtract(totalPrice.multiply(STUDENT_DISCOUNT));
         }
-        return standardPrice;
+        return totalPrice;
     }
 }

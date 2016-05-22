@@ -19,6 +19,11 @@ public class TicketRequestProcesor {
     @Autowired
     MessageConverter messageConverter;
 
+    public TicketRequestProcesor(TicketDistributionService ticketDistributionService, MessageConverter messageConverter) {
+        this.ticketDistributionService = ticketDistributionService;
+        this.messageConverter = messageConverter;
+    }
+
     @RabbitListener(queues = "queue")
     public Message receiveTicketRequestAndProcess(Message request) throws Exception {
         TicketRequest ticketRequest = (TicketRequest) messageConverter.fromMessage(request);

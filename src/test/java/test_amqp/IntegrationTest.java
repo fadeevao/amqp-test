@@ -12,6 +12,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -23,11 +24,12 @@ import test_amqp.api.TicketRequestController;
 
 import java.io.IOException;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { TicketRequestController.class, TestQueueConfig.class, TicketDistributionService.class, DistanceCalculator.class})
@@ -63,9 +65,13 @@ public class IntegrationTest {
     public void testStatusOkIsReturned() throws Exception {
         mockMvc.perform(
                 post("/ticket")
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(withContent("json/validModel/ValidTicketRequest.json")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.ticketType", is("RETURN")))
+                .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
+                .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")));
     }
 
     private String withContent(String filePath) throws IOException {
