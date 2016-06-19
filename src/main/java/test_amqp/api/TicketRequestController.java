@@ -39,7 +39,7 @@ public class TicketRequestController {
     public @ResponseBody  ResponseEntity receiveTicketRequest(@Valid @RequestBody TicketRequest ticketRequest) {
         logger.info("Received a ticket request" + ticketRequest.toString());
         Message message = rabbitTemplate.sendAndReceive(MessageHelper.buildMessage(ticketRequest, messageConverter));
-        Ticket ticket = null;
+        Ticket ticket;
         if (message != null) {
              ticket = (Ticket) messageConverter.fromMessage(message);
         } else {

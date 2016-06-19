@@ -2,6 +2,9 @@ package test_amqp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import test_amqp.calculator.DistanceCalculator;
+import test_amqp.calculator.PriceCalculator;
+import test_amqp.calculator.PriceRequestInternal;
 import test_amqp.model.JourneyDirections;
 import test_amqp.model.Ticket;
 import test_amqp.model.TicketRequest;
@@ -24,13 +27,20 @@ public class TicketDistributionService {
     public Ticket processTicketRequest(TicketRequest ticketRequest){
         return new Ticket.TicketBuilder().withJourneyDirections(ticketRequest.getJourneyDirections())
                 .withTicketType(ticketRequest.getTicketType())
-                .withTotalPrice(calculatePrice(ticketRequest.getJourneyDirections(), ticketRequest.isStudentTicket(),  ticketRequest.getNumberOfTickets()))
+                .withTotalPrice(calculatePriceBasedOnDistanceAndTicketType(ticketRequest))
                 .build();
     }
 
 
-    private BigDecimal calculatePrice(JourneyDirections journeyDirections, boolean studentTicket, int numberOfTickets) {
+    private BigDecimal calculatePriceBasedOnDistanceAndTicketType(TicketRequest ticketRequest) {
+        JourneyDirections journeyDirections = ticketRequest.getJourneyDirections();
         BigDecimal distance = distanceCalculator.calculateDistance(journeyDirections.getFrom(), journeyDirections.getTo());
-        return PriceCalculator.calculatePricePerDistanceAndNumberofTickets(distance, studentTicket, numberOfTickets);
+        PriceRequestInternal priceRequestInternal = PriceRequestInternal.PriceRequestInternalBuilder.aPriceRequestInternal()
+                .withStudentPrice(ticketRequest.isStudentTicket())
+                .withDistance(distance)
+                .withNumberOfTickets(ticketRequest.getNumberOfTickets())
+                .withTicketType(ticketRequest.getTicketType())
+                .build();
+        return PriceCalculator.calculatePricePerDistanceTicketTypeAndNumberofTickets(priceRequestInternal);
     }
 }

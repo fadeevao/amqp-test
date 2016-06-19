@@ -1,4 +1,4 @@
-package test_amqp;
+package test_amqp.calculator;
 
 
 import org.springframework.stereotype.Component;
@@ -39,15 +39,19 @@ public class DistanceCalculator {
         for (Direction direction : from.reachableDirections.keySet()) {
             if (direction.reachableDirections.containsKey(to) && !direction.visited) {
                 direction.visited=true;
-                if (!stops.contains(from)) stops.add(from);
-                if (!stops.contains(direction)) stops.add(direction);
-                if (!stops.contains(to))stops.add(to);
+                addRequiredStopsToThePath(from, to, stops, direction);
                 findPath(from, direction, stops);
             } else if (!direction.visited) {
                 direction.visited=true;
                 findPath(direction, to, stops);
             }
         }
+    }
+
+    private void addRequiredStopsToThePath(Direction from, Direction to, List<Direction> stops, Direction direction) {
+        if (!stops.contains(from)) stops.add(from);
+        if (!stops.contains(direction)) stops.add(direction);
+        if (!stops.contains(to))stops.add(to);
     }
 
     private void resetBooleanValues() {

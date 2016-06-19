@@ -32,8 +32,20 @@ public class TicketRequest implements Serializable{
     @Valid
     private JourneyDirections journeyDirections;
 
+    public TicketRequest(TicketType ticketType, Date dateTime, boolean isStudentTicket, boolean adult, Integer numberOfTickets, JourneyDirections journeyDirections) {
+        this.ticketType = ticketType;
+        this.dateTime = dateTime;
+        this.isStudentTicket = isStudentTicket;
+        this.isAdultTicket = adult;
+        this.numberOfTickets = numberOfTickets;
+        this.journeyDirections = journeyDirections;
+    }
+
+    //for jackson
+    public TicketRequest() {}
+
     public JourneyDirections getJourneyDirections() {
-        return journeyDirections;
+            return journeyDirections;
     }
 
     public void setJourneyDirections(JourneyDirections journeyDirections) {
@@ -79,17 +91,6 @@ public class TicketRequest implements Serializable{
     public void setTicketType(TicketType ticketType) {
         this.ticketType = ticketType;
     }
-
-    public TicketRequest(TicketType ticketType, Date dateTime, boolean isStudentTicket, boolean adult, Integer numberOfTickets, JourneyDirections journeyDirections) {
-        this.ticketType = ticketType;
-        this.dateTime = dateTime;
-        this.isStudentTicket = isStudentTicket;
-        this.isAdultTicket = adult;
-        this.numberOfTickets = numberOfTickets;
-        this.journeyDirections = journeyDirections;
-    }
-
-    public TicketRequest() {}
 
 
     @Override

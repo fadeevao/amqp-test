@@ -2,6 +2,7 @@ package test_amqp;
 
 
 import org.junit.Test;
+import test_amqp.calculator.DistanceCalculator;
 
 import java.math.BigDecimal;
 

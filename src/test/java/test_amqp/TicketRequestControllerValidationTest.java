@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import test_amqp.api.TicketRequestController;
+import test_amqp.calculator.DistanceCalculator;
+import test_amqp.config.QueueConfig;
 
 import java.io.IOException;
 
@@ -63,8 +65,7 @@ public class TicketRequestControllerValidationTest {
                 post("/ticket")
                         .contentType("application/json")
                         .content(withContent("json/invalidModel/MissingDateTime.json")))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -73,8 +74,7 @@ public class TicketRequestControllerValidationTest {
                 post("/ticket")
                         .contentType("application/json")
                         .content(withContent("json/invalidModel/DateTimeWrongFormat.json")))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -83,8 +83,7 @@ public class TicketRequestControllerValidationTest {
                 post("/ticket")
                         .contentType("application/json")
                         .content(withContent("json/invalidModel/NumberOfTicketsIsZero.json")))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -93,8 +92,7 @@ public class TicketRequestControllerValidationTest {
                 post("/ticket")
                         .contentType("application/json")
                         .content(withContent("json/invalidModel/JourneyDirectionsMissing.json")))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -103,8 +101,7 @@ public class TicketRequestControllerValidationTest {
                 post("/ticket")
                         .contentType("application/json")
                         .content(withContent("json/invalidModel/ToDirectionMissing.json")))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+                .andExpect(status().isBadRequest());
     }
 
 

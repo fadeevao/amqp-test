@@ -11,7 +11,7 @@ import test_amqp.model.TicketRequest;
 
 @EnableRabbit
 @Component
-public class TicketRequestProcesor {
+public class TicketRequestProcessor {
 
     @Autowired
     TicketDistributionService ticketDistributionService;
@@ -19,7 +19,7 @@ public class TicketRequestProcesor {
     @Autowired
     MessageConverter messageConverter;
 
-    public TicketRequestProcesor(TicketDistributionService ticketDistributionService, MessageConverter messageConverter) {
+    public TicketRequestProcessor(TicketDistributionService ticketDistributionService, MessageConverter messageConverter) {
         this.ticketDistributionService = ticketDistributionService;
         this.messageConverter = messageConverter;
     }

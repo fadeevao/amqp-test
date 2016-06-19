@@ -1,4 +1,4 @@
-package test_amqp.TestConfig;
+package test_amqp.testConfig;
 
 
 import org.mockito.Mockito;
@@ -9,9 +9,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
-import test_amqp.DistanceCalculator;
+import test_amqp.calculator.DistanceCalculator;
 import test_amqp.TicketDistributionService;
-import test_amqp.TicketRequestProcesor;
+import test_amqp.TicketRequestProcessor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 public class TestQueueConfig {
 
 
-    private TicketRequestProcesor ticketRequestProcesor = new TicketRequestProcesor(ticketDistributionService(), messageConverter());
+    private TicketRequestProcessor ticketRequestProcesor = new TicketRequestProcessor(ticketDistributionService(), messageConverter());
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
