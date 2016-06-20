@@ -29,14 +29,6 @@ public class TestQueueConfig {
         doNothing().when(rabbitTemplate).send(any(Message.class));
 
 
-
-//        doReturn(messageConverter().toMessage(new Ticket.TicketBuilder()
-//                .withTicketType(TicketType.RETURN)
-//                .withJourneyDirections(new JourneyDirections(Direction.BRIGHTON, Direction.HOVE))
-//                .withTotalPrice(BigDecimal.TEN).build(),
-//                new MessageProperties()))
-//                .when(rabbitTemplate).sendAndReceive(any(Message.class));
-
         Mockito.when(rabbitTemplate.sendAndReceive(any(Message.class))).thenAnswer(new Answer() {
             public Object answer(InvocationOnMock invocation) throws Exception {
                 Object[] args = invocation.getArguments();
@@ -62,5 +54,6 @@ public class TestQueueConfig {
     public TicketDistributionService ticketDistributionService () {
         return new TicketDistributionService(distanceCalculator());
     }
+
 
 }

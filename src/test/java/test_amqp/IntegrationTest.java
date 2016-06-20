@@ -19,12 +19,17 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import test_amqp.testConfig.TestQueueConfig;
 import test_amqp.api.TicketRequestController;
 import test_amqp.calculator.DistanceCalculator;
+import test_amqp.entities.TicketPriceDetails;
+import test_amqp.repos.TicketPriceDetailsRepository;
+import test_amqp.testConfig.TestQueueConfig;
 
 import java.io.IOException;
+import java.util.Collection;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -33,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TicketRequestController.class, TestQueueConfig.class, TicketDistributionService.class, DistanceCalculator.class})
+@ContextConfiguration(classes = { TicketRequestController.class, TestQueueConfig.class, TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
 @WebAppConfiguration
 public class IntegrationTest {
 
@@ -48,6 +53,9 @@ public class IntegrationTest {
 
     @Mock
     TicketDistributionService ticketDistributionService;
+
+    @Autowired
+    TicketPriceDetailsRepository ticketPriceDetailsRepository;
 
     @Autowired
     private WebApplicationContext wac;
@@ -72,7 +80,10 @@ public class IntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
-                .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")));
+                .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
+                .andExpect(jsonPath("$.totalPrice", equalTo(6.0)))
+                .andExpect(jsonPath("$.ticketId", equalTo(1)));
+        assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
     }
 
     private String withContent(String filePath) throws IOException {

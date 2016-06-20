@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import test_amqp.calculator.DistanceCalculator;
 import test_amqp.calculator.PriceCalculator;
 import test_amqp.calculator.PriceRequestInternal;
+import test_amqp.entities.TicketPriceDetails;
 import test_amqp.model.JourneyDirections;
-import test_amqp.model.Ticket;
+import test_amqp.model.PriceInformation;
 import test_amqp.model.TicketRequest;
+import test_amqp.repos.TicketPriceDetailsRepository;
 
 import java.math.BigDecimal;
 
@@ -17,6 +19,9 @@ public class TicketDistributionService {
     @Autowired
     private DistanceCalculator distanceCalculator;
 
+    @Autowired
+    private TicketPriceDetailsRepository ticketPriceDetailsRepository;
+
     public TicketDistributionService(DistanceCalculator distanceCalculator) {
         this.distanceCalculator = distanceCalculator;
     }
@@ -24,10 +29,15 @@ public class TicketDistributionService {
     public TicketDistributionService() {}
 
 
-    public Ticket processTicketRequest(TicketRequest ticketRequest){
-        return new Ticket.TicketBuilder().withJourneyDirections(ticketRequest.getJourneyDirections())
+    public PriceInformation generatePriceInformation(TicketRequest ticketRequest){
+        BigDecimal price = calculatePriceBasedOnDistanceAndTicketType(ticketRequest);
+        TicketPriceDetails ticketPriceDetails = new TicketPriceDetails();
+        ticketPriceDetails.setPrice(price);
+        ticketPriceDetailsRepository.save(ticketPriceDetails);
+        return new PriceInformation.PriceInformationBuilder().withJourneyDirections(ticketRequest.getJourneyDirections())
                 .withTicketType(ticketRequest.getTicketType())
-                .withTotalPrice(calculatePriceBasedOnDistanceAndTicketType(ticketRequest))
+                .withTotalPrice(price)
+                .withTicketId(ticketPriceDetails.getId())
                 .build();
     }
 

@@ -9,12 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import test_amqp.MessageHelper;
 import test_amqp.TicketDistributionService;
-import test_amqp.model.Ticket;
+import test_amqp.model.PriceInformation;
 import test_amqp.model.TicketRequest;
 
 import javax.validation.Valid;
@@ -36,12 +35,12 @@ public class TicketRequestController {
     TicketDistributionService ticketDistributionService;
 
     @RequestMapping(value = "/ticket", method = POST, consumes = "application/json")
-    public @ResponseBody  ResponseEntity receiveTicketRequest(@Valid @RequestBody TicketRequest ticketRequest) {
+    public  ResponseEntity receiveTicketRequest(@Valid @RequestBody TicketRequest ticketRequest) {
         logger.info("Received a ticket request" + ticketRequest.toString());
         Message message = rabbitTemplate.sendAndReceive(MessageHelper.buildMessage(ticketRequest, messageConverter));
-        Ticket ticket;
+        PriceInformation ticket;
         if (message != null) {
-             ticket = (Ticket) messageConverter.fromMessage(message);
+             ticket = (PriceInformation) messageConverter.fromMessage(message);
         } else {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }

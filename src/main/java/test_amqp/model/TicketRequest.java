@@ -96,9 +96,9 @@ public class TicketRequest implements Serializable{
     @Override
     public String toString() {
         if (ticketType != null && journeyDirections != null) {
-            return ticketType.description + "Ticket Request from " + journeyDirections.getFrom() + " to " + journeyDirections.getTo();
+            return ticketType.description + "PriceInformation Request from " + journeyDirections.getFrom() + " to " + journeyDirections.getTo();
         } else {
-            return "Ticket request";
+            return "PriceInformation request";
         }
     }
 

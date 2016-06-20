@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/test-amqp.iml" filepath="$PROJECT_DIR$/test-amqp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JourneyTicketsAmqp.iml" filepath="$PROJECT_DIR$/JourneyTicketsAmqp.iml" />
     </modules>
   </component>
 </project>

@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -11,8 +12,12 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@EnableRabbit
 @Configuration
 public class QueueConfig {
+
+    private final static String ROUTING_KEY = "routing.key";
+    private final static String EXCHANGE= "exchange";
     @Bean
     public CachingConnectionFactory rabbitConnectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
@@ -26,8 +31,8 @@ public class QueueConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(rabbitConnectionFactory());
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         rabbitTemplate.setConnectionFactory(rabbitConnectionFactory());
-        rabbitTemplate.setExchange("exchange");
-        rabbitTemplate.setRoutingKey("routing.key");
+        rabbitTemplate.setExchange(EXCHANGE);
+        rabbitTemplate.setRoutingKey(ROUTING_KEY);
         return rabbitTemplate;
     }
 
@@ -38,12 +43,12 @@ public class QueueConfig {
 
     @Bean
     public DirectExchange directExchange() {
-        return new DirectExchange("exchange",false, false);
+        return new DirectExchange(EXCHANGE, false, false);
     }
 
     @Bean
     public Binding bindQueue() {
-        return BindingBuilder.bind(queue()).to(directExchange()).with("routing.key");
+        return BindingBuilder.bind(queue()).to(directExchange()).with(ROUTING_KEY);
     }
 
     @Bean

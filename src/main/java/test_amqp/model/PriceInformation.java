@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @JsonSerialize
-public class Ticket implements Serializable{
+public class PriceInformation implements Serializable{
 
     private BigDecimal totalPrice;
 
@@ -14,14 +14,17 @@ public class Ticket implements Serializable{
 
     private TicketType ticketType;
 
+    private Long ticketId;
 
-    public Ticket(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType) {
+
+    public PriceInformation(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType, Long ticketId) {
         this.totalPrice = totalPrice;
         this.journeyDirections = journeyDirections;
         this.ticketType = ticketType;
+        this.ticketId = ticketId;
     }
 
-    public Ticket() {}
+    public PriceInformation() {}
 
     public BigDecimal getTotalPrice() {
         return totalPrice;
@@ -47,36 +50,51 @@ public class Ticket implements Serializable{
         this.ticketType = ticketType;
     }
 
-    @Override
-    public String toString() {
-        return "Ticket with ticket type: " + ticketType.toString() + ", journey directions: " + journeyDirections.toString();
+    public Long getTicketId() {
+        return ticketId;
     }
 
-    public static class TicketBuilder {
+    public void setTicketId(Long ticketId) {
+        this.ticketId = ticketId;
+    }
+
+    @Override
+    public String toString() {
+        return "PriceInformation with ticket type: " + ticketType.toString() + ", journey directions: " + journeyDirections.toString();
+    }
+
+    public static class PriceInformationBuilder {
         private BigDecimal totalPrice;
 
         private JourneyDirections journeyDirections;
 
         private TicketType ticketType;
 
-        public TicketBuilder withTotalPrice(BigDecimal totalPrice) {
+        private Long ticketId;
+
+        public PriceInformationBuilder withTotalPrice(BigDecimal totalPrice) {
             this.totalPrice = totalPrice;
             return this;
         }
 
-        public TicketBuilder withJourneyDirections(JourneyDirections journeyDirections) {
+        public PriceInformationBuilder withJourneyDirections(JourneyDirections journeyDirections) {
             this.journeyDirections = journeyDirections;
             return this;
         }
 
+        public PriceInformationBuilder withTicketId(Long id) {
+            this.ticketId = id;
+            return this;
+        }
 
-        public TicketBuilder withTicketType(TicketType ticketType) {
+
+        public PriceInformationBuilder withTicketType(TicketType ticketType) {
             this.ticketType = ticketType;
             return this;
         }
 
-        public Ticket build() {
-            return new Ticket(totalPrice, journeyDirections, ticketType);
+        public PriceInformation build() {
+            return new PriceInformation(totalPrice, journeyDirections, ticketType, ticketId);
         }
     }
 }
