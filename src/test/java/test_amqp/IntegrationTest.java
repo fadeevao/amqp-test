@@ -68,6 +68,7 @@ public class IntegrationTest {
         doNothing().when(template).send(any(Message.class));
         doReturn(new Message("Message".getBytes(), new MessageProperties())).when(template).sendAndReceive(any(Message.class));
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
+        ticketPriceDetailsRepository.deleteAll();
     }
 
     @Test

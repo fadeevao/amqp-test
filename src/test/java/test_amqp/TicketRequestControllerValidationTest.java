@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,7 +19,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import test_amqp.api.TicketRequestController;
 import test_amqp.calculator.DistanceCalculator;
-import test_amqp.config.QueueConfig;
+import test_amqp.repos.TicketPriceDetailsRepository;
+import test_amqp.testConfig.TestQueueConfig;
 
 import java.io.IOException;
 
@@ -28,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TicketRequestController.class, TicketDistributionService.class, QueueConfig.class, DistanceCalculator.class})
+@ContextConfiguration(classes = { TicketRequestController.class, TestQueueConfig.class, TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
 @WebAppConfiguration
 public class TicketRequestControllerValidationTest {
 
@@ -36,7 +38,16 @@ public class TicketRequestControllerValidationTest {
     RabbitTemplate template;
 
     @InjectMocks
-    TicketRequestController ticketRequestController = new TicketRequestController();
+    TicketRequestController ticketRequestController;
+
+    @Mock
+    MessageConverter messageConverter;
+
+    @Mock
+    TicketDistributionService ticketDistributionService;
+
+    @Autowired
+    TicketPriceDetailsRepository ticketPriceDetailsRepository;
 
     @Autowired
     private WebApplicationContext wac;
