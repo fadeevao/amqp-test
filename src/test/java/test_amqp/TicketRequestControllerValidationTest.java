@@ -20,7 +20,6 @@ import org.springframework.web.context.WebApplicationContext;
 import test_amqp.api.TicketRequestController;
 import test_amqp.calculator.DistanceCalculator;
 import test_amqp.repos.TicketPriceDetailsRepository;
-import test_amqp.testConfig.TestQueueConfig;
 
 import java.io.IOException;
 
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TicketRequestController.class, TestQueueConfig.class, TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
+@ContextConfiguration(classes = { TicketRequestController.class, TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
 @WebAppConfiguration
 public class TicketRequestControllerValidationTest {
 

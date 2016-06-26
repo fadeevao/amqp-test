@@ -6,7 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,7 +26,6 @@ import test_amqp.api.TicketRequestController;
 import test_amqp.calculator.DistanceCalculator;
 import test_amqp.entities.TicketPriceDetails;
 import test_amqp.repos.TicketPriceDetailsRepository;
-import test_amqp.testConfig.TestQueueConfig;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -38,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TicketRequestController.class, TestQueueConfig.class, TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
+@ContextConfiguration(classes = {TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
 @WebAppConfiguration
 public class IntegrationTest {
 
@@ -46,12 +48,13 @@ public class IntegrationTest {
     RabbitTemplate template;
 
     @InjectMocks
+    @Autowired
     TicketRequestController ticketRequestController;
 
-    @Mock
+    @Autowired
     MessageConverter messageConverter;
 
-    @Mock
+    @Autowired
     TicketDistributionService ticketDistributionService;
 
     @Autowired
@@ -61,12 +64,21 @@ public class IntegrationTest {
     private WebApplicationContext wac;
 
     MockMvc mockMvc;
+    
+    @Autowired
+    TicketRequestProcessor ticketRequestProcesor = new TicketRequestProcessor(ticketDistributionService, messageConverter);
 
     @Before
     public void setUp() {
+    	
         MockitoAnnotations.initMocks(this);
-        doNothing().when(template).send(any(Message.class));
-        doReturn(new Message("Message".getBytes(), new MessageProperties())).when(template).sendAndReceive(any(Message.class));
+        Mockito.when(template.sendAndReceive(any(Message.class))).thenAnswer(new Answer() {
+            public Object answer(InvocationOnMock invocation) throws Exception {
+                Object[] args = invocation.getArguments();
+                Object mock = invocation.getMock();
+                return ticketRequestProcesor.receiveTicketRequestAndProcess((Message)args[0]);
+            }
+        });
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
         ticketPriceDetailsRepository.deleteAll();
     }
@@ -78,7 +90,7 @@ public class IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(withContent("json/validModel/ValidTicketRequest.json")))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                //.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))

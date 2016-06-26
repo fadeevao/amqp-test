@@ -11,9 +11,13 @@ import test_amqp.model.TicketRequest;
 @Component
 public class TicketRequestProcessor {
 
+	@Autowired
     TicketDistributionService ticketDistributionService;
-
+    
+    @Autowired
     MessageConverter messageConverter;
+    
+    public TicketRequestProcessor() {}
 
     @Autowired
     public TicketRequestProcessor(TicketDistributionService ticketDistributionService, MessageConverter messageConverter) {

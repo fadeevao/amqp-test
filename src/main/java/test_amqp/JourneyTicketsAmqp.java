@@ -7,7 +7,6 @@ import org.springframework.test.context.ContextConfiguration;
 import test_amqp.config.QueueConfig;
 
 @SpringBootApplication
-@ContextConfiguration(classes = {QueueConfig.class})
 @EnableJpaRepositories
 public class JourneyTicketsAmqp {
 
