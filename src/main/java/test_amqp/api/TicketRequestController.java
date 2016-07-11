@@ -14,6 +14,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import test_amqp.MessageHelper;
 import test_amqp.TicketDistributionService;
 import test_amqp.model.PriceInformation;
+import test_amqp.model.Ticket;
+import test_amqp.model.TicketPayment;
 import test_amqp.model.TicketRequest;
 
 import javax.validation.Valid;
@@ -37,15 +39,25 @@ public class TicketRequestController {
     @RequestMapping(value = "/ticket", method = POST, consumes = "application/json")
     public  ResponseEntity receiveTicketRequest(@Valid @RequestBody TicketRequest ticketRequest) {
         logger.info("Received a ticket request" + ticketRequest.toString());
-        Message message = rabbitTemplate.sendAndReceive(MessageHelper.buildMessage(ticketRequest, messageConverter));
-        PriceInformation ticket;
+        Message message = rabbitTemplate.sendAndReceive("request", MessageHelper.buildMessage(ticketRequest, messageConverter));
+        PriceInformation priceInformation;
         if (message != null) {
-             ticket = (PriceInformation) messageConverter.fromMessage(message);
-        } else {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            priceInformation = (PriceInformation) messageConverter.fromMessage(message);
+            return new ResponseEntity(priceInformation, HttpStatus.OK);
         }
-        return new ResponseEntity(ticket, HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
 
+    @RequestMapping(value="/ticket/payment", method = POST, consumes = "application/json")
+    public ResponseEntity processPaymentAndReturnTicket(@Valid @RequestBody TicketPayment ticketPayment) {
+        logger.info("Received a ticket payment for a ticket with ID " + ticketPayment.getTicketId());
+        Message messageReceived = rabbitTemplate.sendAndReceive("payment", MessageHelper.buildMessage(ticketPayment, messageConverter));
+        Ticket ticket;
+        if (messageReceived != null) {
+            ticket = (Ticket) messageConverter.fromMessage(messageReceived);
+            return new ResponseEntity(ticket, HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
 }

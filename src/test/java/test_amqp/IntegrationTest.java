@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +27,17 @@ import test_amqp.entities.TicketPriceDetails;
 import test_amqp.repos.TicketPriceDetailsRepository;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Matchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
@@ -72,11 +72,11 @@ public class IntegrationTest {
     public void setUp() {
     	
         MockitoAnnotations.initMocks(this);
-        Mockito.when(template.sendAndReceive(any(Message.class))).thenAnswer(new Answer() {
+        Mockito.when(template.sendAndReceive(eq("request"), any(Message.class))).thenAnswer(new Answer() {
             public Object answer(InvocationOnMock invocation) throws Exception {
                 Object[] args = invocation.getArguments();
                 Object mock = invocation.getMock();
-                return ticketRequestProcesor.receiveTicketRequestAndProcess((Message)args[0]);
+                return ticketRequestProcesor.receiveTicketRequestAndProcess((Message)args[1]);
             }
         });
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
@@ -90,13 +90,16 @@ public class IntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(withContent("json/validModel/ValidTicketRequest.json")))
                 .andExpect(status().isOk())
-                //.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
                 .andExpect(jsonPath("$.totalPrice", equalTo(6.0)))
                 .andExpect(jsonPath("$.ticketId", equalTo(1)));
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
+        TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
+        assertEquals(new Long(1), ticketPriceDetails.getId());
+        assertEquals(new BigDecimal("6.00"), ticketPriceDetails.getPrice());
+
     }
 
     private String withContent(String filePath) throws IOException {

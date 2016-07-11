@@ -16,8 +16,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QueueConfig {
 
-    private final static String ROUTING_KEY = "routing.key";
-    private final static String EXCHANGE= "exchange";
+    private final static String EXCHANGE= "service";
+    private final static String REQUEST_ROUTING_KEY = "request";
+    private final static String PAYMENT_ROUTING_KEY = "payment";
+
     @Bean
     public CachingConnectionFactory rabbitConnectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
@@ -32,13 +34,17 @@ public class QueueConfig {
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         rabbitTemplate.setConnectionFactory(rabbitConnectionFactory());
         rabbitTemplate.setExchange(EXCHANGE);
-        rabbitTemplate.setRoutingKey(ROUTING_KEY);
         return rabbitTemplate;
     }
 
     @Bean
-    public Queue queue() {
-        return new Queue("queue");
+    public Queue requestQueue() {
+        return new Queue("requestQueue");
+    }
+
+    @Bean
+    public Queue paymentQueue() {
+        return new Queue("paymentQueue");
     }
 
     @Bean
@@ -47,8 +53,13 @@ public class QueueConfig {
     }
 
     @Bean
-    public Binding bindQueue() {
-        return BindingBuilder.bind(queue()).to(directExchange()).with(ROUTING_KEY);
+    public Binding requestQueueBinding() {
+        return BindingBuilder.bind(requestQueue()).to(directExchange()).with(REQUEST_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding paymentQueueBinding() {
+        return BindingBuilder.bind(paymentQueue()).to(directExchange()).with(PAYMENT_ROUTING_KEY);
     }
 
     @Bean

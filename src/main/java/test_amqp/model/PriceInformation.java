@@ -6,49 +6,18 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @JsonSerialize
-public class PriceInformation implements Serializable{
-
-    private BigDecimal totalPrice;
-
-    private JourneyDirections journeyDirections;
-
-    private TicketType ticketType;
+public class PriceInformation extends Ticket implements Serializable{
 
     private Long ticketId;
 
 
     public PriceInformation(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType, Long ticketId) {
-        this.totalPrice = totalPrice;
-        this.journeyDirections = journeyDirections;
-        this.ticketType = ticketType;
+        super(totalPrice, journeyDirections, ticketType);
         this.ticketId = ticketId;
     }
 
     public PriceInformation() {}
 
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public JourneyDirections getJourneyDirections() {
-        return journeyDirections;
-    }
-
-    public void setJourneyDirections(JourneyDirections journeyDirections) {
-        this.journeyDirections = journeyDirections;
-    }
-
-    public TicketType getTicketType() {
-        return ticketType;
-    }
-
-    public void setTicketType(TicketType ticketType) {
-        this.ticketType = ticketType;
-    }
 
     public Long getTicketId() {
         return ticketId;

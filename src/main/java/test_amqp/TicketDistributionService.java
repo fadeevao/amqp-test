@@ -8,6 +8,7 @@ import test_amqp.calculator.PriceRequestInternal;
 import test_amqp.entities.TicketPriceDetails;
 import test_amqp.model.JourneyDirections;
 import test_amqp.model.PriceInformation;
+import test_amqp.model.Ticket;
 import test_amqp.model.TicketRequest;
 import test_amqp.repos.TicketPriceDetailsRepository;
 
@@ -52,5 +53,9 @@ public class TicketDistributionService {
                 .withTicketType(ticketRequest.getTicketType())
                 .build();
         return PriceCalculator.calculatePricePerDistanceTicketTypeAndNumberofTickets(priceRequestInternal);
+    }
+
+    public Ticket generateTicket() {
+        return new Ticket();
     }
 }
