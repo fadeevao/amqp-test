@@ -79,6 +79,14 @@ public class IntegrationTest {
                 return ticketRequestProcesor.receiveTicketRequestAndProcess((Message)args[1]);
             }
         });
+
+        Mockito.when(template.sendAndReceive(eq("payment"), any(Message.class))).thenAnswer(new Answer() {
+            public Object answer(InvocationOnMock invocation) throws Exception {
+                Object[] args = invocation.getArguments();
+                Object mock = invocation.getMock();
+                return ticketRequestProcesor.receivePaymentAndGenerateTicket((Message)args[1]);
+            }
+        });
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
         ticketPriceDetailsRepository.deleteAll();
     }
@@ -99,6 +107,16 @@ public class IntegrationTest {
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
         assertEquals(new Long(1), ticketPriceDetails.getId());
         assertEquals(new BigDecimal("6.00"), ticketPriceDetails.getPrice());
+
+        mockMvc.perform(
+                post("/ticket/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(withContent("json/validModel/ValidTicketPayment.json")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ticketType", is("RETURN")))
+                .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
+                .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
+                .andExpect(jsonPath("$.totalPrice", equalTo(6.0)));
 
     }
 

@@ -6,10 +6,7 @@ import test_amqp.calculator.DistanceCalculator;
 import test_amqp.calculator.PriceCalculator;
 import test_amqp.calculator.PriceRequestInternal;
 import test_amqp.entities.TicketPriceDetails;
-import test_amqp.model.JourneyDirections;
-import test_amqp.model.PriceInformation;
-import test_amqp.model.Ticket;
-import test_amqp.model.TicketRequest;
+import test_amqp.model.*;
 import test_amqp.repos.TicketPriceDetailsRepository;
 
 import java.math.BigDecimal;
@@ -34,6 +31,9 @@ public class TicketDistributionService {
         BigDecimal price = calculatePriceBasedOnDistanceAndTicketType(ticketRequest);
         TicketPriceDetails ticketPriceDetails = new TicketPriceDetails();
         ticketPriceDetails.setPrice(price);
+        ticketPriceDetails.setTicketType(ticketRequest.getTicketType());
+        ticketPriceDetails.setTo(ticketRequest.getJourneyDirections().getTo());
+        ticketPriceDetails.setFromDirection(ticketRequest.getJourneyDirections().getFrom());
         ticketPriceDetailsRepository.save(ticketPriceDetails);
         return new PriceInformation.PriceInformationBuilder().withJourneyDirections(ticketRequest.getJourneyDirections())
                 .withTicketType(ticketRequest.getTicketType())
@@ -55,7 +55,10 @@ public class TicketDistributionService {
         return PriceCalculator.calculatePricePerDistanceTicketTypeAndNumberofTickets(priceRequestInternal);
     }
 
-    public Ticket generateTicket() {
-        return new Ticket();
+    public Ticket generateTicket(TicketPayment payment) {
+        TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findById(payment.getTicketId());
+        JourneyDirections journeyDirections = new JourneyDirections(ticketPriceDetails.getFromDirection(), ticketPriceDetails.getTo());
+        Ticket ticket = new Ticket(payment.getPaymentAmount(), journeyDirections, ticketPriceDetails.getTicketType());
+        return ticket;
     }
 }

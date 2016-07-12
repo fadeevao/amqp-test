@@ -48,7 +48,7 @@ public class TicketRequestProcessor {
     )
     public Message receivePaymentAndGenerateTicket(Message payment) throws Exception {
         TicketPayment ticketRequest = (TicketPayment) messageConverter.fromMessage(payment);
-        Ticket ticket = ticketDistributionService.generateTicket();
+        Ticket ticket = ticketDistributionService.generateTicket(ticketRequest);
         return MessageHelper.buildMessage(ticket, messageConverter);
     }
 
