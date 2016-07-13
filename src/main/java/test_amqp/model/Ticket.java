@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.math.BigDecimal;
 
-@JsonSerialize
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Ticket {
 
     protected BigDecimal totalPrice;
@@ -14,10 +14,18 @@ public class Ticket {
 
     protected TicketType ticketType;
 
+
+    protected BigDecimal change;
+
     public Ticket(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType) {
         this.totalPrice = totalPrice;
         this.journeyDirections = journeyDirections;
         this.ticketType = ticketType;
+    }
+
+    public Ticket(BigDecimal totalPrice, JourneyDirections journeyDirections, TicketType ticketType, BigDecimal change) {
+        this(totalPrice, journeyDirections, ticketType);
+        this.change = change;
     }
 
     public Ticket() {}
@@ -29,6 +37,14 @@ public class Ticket {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public BigDecimal getChange() {
+        return change;
+    }
+
+    public void setChange(BigDecimal change) {
+        this.change = change;
     }
 
     public JourneyDirections getJourneyDirections() {

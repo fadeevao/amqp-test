@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
 @WebAppConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class IntegrationTest {
 
     @Mock
@@ -90,6 +92,8 @@ public class IntegrationTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
         ticketPriceDetailsRepository.deleteAll();
     }
+
+
 
     @Test
     public void testHappyPath() throws Exception {
@@ -140,6 +144,24 @@ public class IntegrationTest {
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
         assertEquals(new Long(1), ticketPriceDetails.getId());
         assertEquals(new BigDecimal("1.00"), ticketPriceDetails.getPrice());
+    }
+
+    @Test
+    public void testPaymentWithChangeRequired() throws Exception {
+        postTicket();
+
+        mockMvc.perform(
+                post("/ticket/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(withContent("json/validModel/TicketPaymentGreaterThanRequired.json")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ticketType", is("RETURN")))
+                .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
+                .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
+                .andExpect(jsonPath("$.totalPrice", equalTo(7.0)))
+                .andExpect(jsonPath("$.change", equalTo(1.0)));
+
+        assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 0);
     }
 
     private void postTicket() throws Exception {

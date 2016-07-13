@@ -60,12 +60,9 @@ public class TicketDistributionService {
         BigDecimal expectedPayment = ticketPriceDetails.getPrice();
         BigDecimal paidAmount = payment.getPaymentAmount();
         JourneyDirections journeyDirections = new JourneyDirections(ticketPriceDetails.getFromDirection(), ticketPriceDetails.getTo());
-        Ticket ticket;
-        if (expectedPayment.compareTo(paidAmount) == 0) {
-            ticket = new Ticket(payment.getPaymentAmount(), journeyDirections, ticketPriceDetails.getTicketType());
-            ticketPriceDetailsRepository.delete(ticketPriceDetails);
-            return ticket;
-        } else if (expectedPayment.compareTo(paidAmount) > 0) {
+
+        BigDecimal changeRequired = paidAmount.subtract(expectedPayment);
+         if (expectedPayment.compareTo(paidAmount) > 0) {
             BigDecimal leftToPay = expectedPayment.subtract(paidAmount);
             ticketPriceDetails.setPrice(leftToPay);
             ticketPriceDetailsRepository.save(ticketPriceDetails);
@@ -75,7 +72,17 @@ public class TicketDistributionService {
                     .withTicketId(ticketPriceDetails.getId())
                     .build();
             return priceInformation;
+        } else {
+            return getTicketAndClearDatabase(payment, ticketPriceDetails, journeyDirections, changeRequired);
         }
-        return new Ticket();
+    }
+
+    private Ticket getTicketAndClearDatabase(TicketPayment payment, TicketPriceDetails ticketPriceDetails, JourneyDirections journeyDirections, BigDecimal changeRequied) {
+        Ticket ticket = new Ticket(payment.getPaymentAmount(), journeyDirections, ticketPriceDetails.getTicketType());
+        if (changeRequied.compareTo(BigDecimal.ZERO) != 0) {
+            ticket.setChange(changeRequied);
+        }
+        ticketPriceDetailsRepository.delete(ticketPriceDetails);
+        return ticket;
     }
 }
