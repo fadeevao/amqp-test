@@ -92,7 +92,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void testStatusOkIsReturned() throws Exception {
+    public void testHappyPath() throws Exception {
         mockMvc.perform(
                 post("/ticket")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,6 +118,35 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
                 .andExpect(jsonPath("$.totalPrice", equalTo(6.0)));
 
+        assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 0);
+    }
+
+    @Test
+    public void testInsufficientPayment() throws Exception {
+        postTicket();
+
+        mockMvc.perform(
+                post("/ticket/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(withContent("json/validModel/InsufficientTicketPayment.json")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ticketType", is("RETURN")))
+                .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
+                .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
+                .andExpect(jsonPath("$.totalPrice", equalTo(1.0)))
+                .andExpect(jsonPath("$.ticketId", equalTo(1)));
+
+        assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
+        TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
+        assertEquals(new Long(1), ticketPriceDetails.getId());
+        assertEquals(new BigDecimal("1.00"), ticketPriceDetails.getPrice());
+    }
+
+    private void postTicket() throws Exception {
+        mockMvc.perform(
+                post("/ticket")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(withContent("json/validModel/ValidTicketRequest.json")));
     }
 
     private String withContent(String filePath) throws IOException {

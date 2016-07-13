@@ -52,9 +52,8 @@ public class TicketRequestController {
     public ResponseEntity processPaymentAndReturnTicket(@Valid @RequestBody TicketPayment ticketPayment) {
         logger.info("Received a ticket payment for a ticket with ID " + ticketPayment.getTicketId());
         Message messageReceived = rabbitTemplate.sendAndReceive("payment", MessageHelper.buildMessage(ticketPayment, messageConverter));
-        Ticket ticket;
         if (messageReceived != null) {
-            ticket = (Ticket) messageConverter.fromMessage(messageReceived);
+            Ticket ticket = (Ticket) messageConverter.fromMessage(messageReceived);
             return new ResponseEntity(ticket, HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);

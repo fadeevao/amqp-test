@@ -57,8 +57,25 @@ public class TicketDistributionService {
 
     public Ticket generateTicket(TicketPayment payment) {
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findById(payment.getTicketId());
+        BigDecimal expectedPayment = ticketPriceDetails.getPrice();
+        BigDecimal paidAmount = payment.getPaymentAmount();
         JourneyDirections journeyDirections = new JourneyDirections(ticketPriceDetails.getFromDirection(), ticketPriceDetails.getTo());
-        Ticket ticket = new Ticket(payment.getPaymentAmount(), journeyDirections, ticketPriceDetails.getTicketType());
-        return ticket;
+        Ticket ticket;
+        if (expectedPayment.compareTo(paidAmount) == 0) {
+            ticket = new Ticket(payment.getPaymentAmount(), journeyDirections, ticketPriceDetails.getTicketType());
+            ticketPriceDetailsRepository.delete(ticketPriceDetails);
+            return ticket;
+        } else if (expectedPayment.compareTo(paidAmount) > 0) {
+            BigDecimal leftToPay = expectedPayment.subtract(paidAmount);
+            ticketPriceDetails.setPrice(leftToPay);
+            ticketPriceDetailsRepository.save(ticketPriceDetails);
+            PriceInformation priceInformation = new PriceInformation.PriceInformationBuilder().withJourneyDirections(journeyDirections)
+                    .withTicketType(ticketPriceDetails.getTicketType())
+                    .withTotalPrice(leftToPay)
+                    .withTicketId(ticketPriceDetails.getId())
+                    .build();
+            return priceInformation;
+        }
+        return new Ticket();
     }
 }
