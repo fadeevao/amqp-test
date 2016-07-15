@@ -3,15 +3,20 @@ package test_amqp.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class Ticket {
 
+    @DecimalMin("0.00")
     protected BigDecimal totalPrice;
 
+    @NotNull
     protected JourneyDirections journeyDirections;
 
+    @NotNull
     protected TicketType ticketType;
 
 

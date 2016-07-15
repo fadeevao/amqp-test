@@ -11,6 +11,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -65,7 +66,7 @@ public class TicketRequestControllerValidationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withContent("json/invalidModel/MissingTicketType.json")))
+                        .content(withContent("json/invalidModel/ticketRequest/MissingTicketType.json")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -74,7 +75,7 @@ public class TicketRequestControllerValidationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withContent("json/invalidModel/MissingDateTime.json")))
+                        .content(withContent("json/invalidModel/ticketRequest/MissingDateTime.json")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -83,7 +84,7 @@ public class TicketRequestControllerValidationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withContent("json/invalidModel/DateTimeWrongFormat.json")))
+                        .content(withContent("json/invalidModel/ticketRequest/DateTimeWrongFormat.json")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -92,7 +93,7 @@ public class TicketRequestControllerValidationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withContent("json/invalidModel/NumberOfTicketsIsZero.json")))
+                        .content(withContent("json/invalidModel/ticketRequest/NumberOfTicketsIsZero.json")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -101,7 +102,7 @@ public class TicketRequestControllerValidationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withContent("json/invalidModel/JourneyDirectionsMissing.json")))
+                        .content(withContent("json/invalidModel/ticketRequest/JourneyDirectionsMissing.json")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -110,7 +111,25 @@ public class TicketRequestControllerValidationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType("application/json")
-                        .content(withContent("json/invalidModel/ToDirectionMissing.json")))
+                        .content(withContent("json/invalidModel/ticketRequest/ToDirectionMissing.json")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testBadRequestWhenSuppliedPaymentIsNegative() throws Exception {
+        mockMvc.perform(
+                post("/ticket/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(withContent("json/invalidModel/payment/TicketPaymentWithNegativeBalance.json")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testBadRequestWhenSuppliedPaymentIdIsNotPresent() throws Exception {
+        mockMvc.perform(
+                post("/ticket/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(withContent("json/invalidModel/payment/TicketPaymentWithMissingId.json")))
                 .andExpect(status().isBadRequest());
     }
 

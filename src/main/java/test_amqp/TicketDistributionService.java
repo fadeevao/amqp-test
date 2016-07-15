@@ -6,6 +6,7 @@ import test_amqp.calculator.DistanceCalculator;
 import test_amqp.calculator.PriceCalculator;
 import test_amqp.calculator.PriceRequestInternal;
 import test_amqp.entities.TicketPriceDetails;
+import test_amqp.exception.TicketReferenceNotFoundException;
 import test_amqp.model.*;
 import test_amqp.repos.TicketPriceDetailsRepository;
 
@@ -35,11 +36,7 @@ public class TicketDistributionService {
         ticketPriceDetails.setTo(ticketRequest.getJourneyDirections().getTo());
         ticketPriceDetails.setFromDirection(ticketRequest.getJourneyDirections().getFrom());
         ticketPriceDetailsRepository.save(ticketPriceDetails);
-        return new PriceInformation.PriceInformationBuilder().withJourneyDirections(ticketRequest.getJourneyDirections())
-                .withTicketType(ticketRequest.getTicketType())
-                .withTotalPrice(price)
-                .withTicketId(ticketPriceDetails.getId())
-                .build();
+        return getPriceInformation(ticketPriceDetails, ticketRequest.getJourneyDirections(), price);
     }
 
 
@@ -55,8 +52,11 @@ public class TicketDistributionService {
         return PriceCalculator.calculatePricePerDistanceTicketTypeAndNumberofTickets(priceRequestInternal);
     }
 
-    public Ticket generateTicket(TicketPayment payment) {
+    public Ticket generateTicket(TicketPayment payment) throws TicketReferenceNotFoundException {
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findById(payment.getTicketId());
+        if (ticketPriceDetails == null) {
+            throw new TicketReferenceNotFoundException("Ticket with the given ID not found: " + payment.getTicketId());
+        }
         BigDecimal expectedPayment = ticketPriceDetails.getPrice();
         BigDecimal paidAmount = payment.getPaymentAmount();
         JourneyDirections journeyDirections = new JourneyDirections(ticketPriceDetails.getFromDirection(), ticketPriceDetails.getTo());
@@ -66,15 +66,18 @@ public class TicketDistributionService {
             BigDecimal leftToPay = expectedPayment.subtract(paidAmount);
             ticketPriceDetails.setPrice(leftToPay);
             ticketPriceDetailsRepository.save(ticketPriceDetails);
-            PriceInformation priceInformation = new PriceInformation.PriceInformationBuilder().withJourneyDirections(journeyDirections)
-                    .withTicketType(ticketPriceDetails.getTicketType())
-                    .withTotalPrice(leftToPay)
-                    .withTicketId(ticketPriceDetails.getId())
-                    .build();
-            return priceInformation;
+             return getPriceInformation(ticketPriceDetails, journeyDirections, leftToPay);
         } else {
             return getTicketAndClearDatabase(payment, ticketPriceDetails, journeyDirections, changeRequired);
         }
+    }
+
+    private PriceInformation getPriceInformation(TicketPriceDetails ticketPriceDetails, JourneyDirections journeyDirections, BigDecimal price) {
+        return new PriceInformation.PriceInformationBuilder().withJourneyDirections(journeyDirections)
+                        .withTicketType(ticketPriceDetails.getTicketType())
+                        .withTotalPrice(price)
+                        .withTicketId(ticketPriceDetails.getId())
+                        .build();
     }
 
     private Ticket getTicketAndClearDatabase(TicketPayment payment, TicketPriceDetails ticketPriceDetails, JourneyDirections journeyDirections, BigDecimal changeRequied) {

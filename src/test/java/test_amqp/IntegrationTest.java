@@ -22,9 +22,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.util.NestedServletException;
 import test_amqp.api.TicketRequestController;
 import test_amqp.calculator.DistanceCalculator;
 import test_amqp.entities.TicketPriceDetails;
+import test_amqp.exception.TicketReferenceNotFoundException;
 import test_amqp.repos.TicketPriceDetailsRepository;
 
 import java.io.IOException;
@@ -100,7 +102,7 @@ public class IntegrationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(withContent("json/validModel/ValidTicketRequest.json")))
+                        .content(withContent("json/validModel/request/ValidTicketRequest.json")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
@@ -115,7 +117,7 @@ public class IntegrationTest {
         mockMvc.perform(
                 post("/ticket/payment")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(withContent("json/validModel/ValidTicketPayment.json")))
+                        .content(withContent("json/validModel/payment/ValidTicketPayment.json")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
@@ -132,7 +134,7 @@ public class IntegrationTest {
         mockMvc.perform(
                 post("/ticket/payment")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(withContent("json/validModel/InsufficientTicketPayment.json")))
+                        .content(withContent("json/validModel/payment/InsufficientTicketPayment.json")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
@@ -146,6 +148,20 @@ public class IntegrationTest {
         assertEquals(new BigDecimal("1.00"), ticketPriceDetails.getPrice());
     }
 
+    @Test(expected = NestedServletException.class)
+    public void testExceptionThrownWhenTicketPaymentReferenceNotFound() throws Exception {
+        try {
+            mockMvc.perform(
+                    post("/ticket/payment")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(withContent("json/validModel/payment/InsufficientTicketPayment.json")))
+                    .andExpect(status().isBadRequest());
+        } catch (TicketReferenceNotFoundException e) {
+            assertEquals(e.getCause().getClass(), TicketReferenceNotFoundException.class);
+            assertEquals(e.getCause().getMessage(), "Ticket with the given ID not found: 1");
+        }
+    }
+
     @Test
     public void testPaymentWithChangeRequired() throws Exception {
         postTicket();
@@ -153,7 +169,7 @@ public class IntegrationTest {
         mockMvc.perform(
                 post("/ticket/payment")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(withContent("json/validModel/TicketPaymentGreaterThanRequired.json")))
+                        .content(withContent("json/validModel/payment/TicketPaymentGreaterThanRequired.json")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
@@ -168,7 +184,7 @@ public class IntegrationTest {
         mockMvc.perform(
                 post("/ticket")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(withContent("json/validModel/ValidTicketRequest.json")));
+                        .content(withContent("json/validModel/request/ValidTicketRequest.json")));
     }
 
     private String withContent(String filePath) throws IOException {
