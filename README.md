@@ -10,8 +10,5 @@ The flow:
 
 
 Technologies used:
-Spring
-RabbitMQ
-Mockito
-MockMVC
+Spring, ,RabbitMQ, Mockito,MockMVC
 
