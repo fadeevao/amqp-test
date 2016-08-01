@@ -9,11 +9,18 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import java.net.URISyntaxException;
 
 @EnableRabbit
 @Configuration
+@ComponentScan(basePackages = "test_amqp.calculator")
 public class QueueConfig {
 
     private final static String EXCHANGE= "service";
@@ -27,6 +34,13 @@ public class QueueConfig {
         return connectionFactory;
     }
 
+    @Bean
+    public static PropertyPlaceholderConfigurer properties() throws URISyntaxException {
+        PropertyPlaceholderConfigurer proprty =  new PropertyPlaceholderConfigurer();
+        proprty.setLocations(new Resource[] {
+                new ClassPathResource("application.properties")});
+        return proprty;
+    }
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
@@ -66,4 +80,5 @@ public class QueueConfig {
     public MessageConverter messageConverter() {
         return rabbitTemplate().getMessageConverter();
     }
+
 }

@@ -14,9 +14,10 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.NestedServletException;
 import test_amqp.api.TicketRequestController;
-import test_amqp.calculator.DistanceCalculator;
+import test_amqp.calculator.GoogleMapsDistanceCalculator;
 import test_amqp.entities.TicketPriceDetails;
 import test_amqp.exception.TicketReferenceNotFoundException;
 import test_amqp.repos.TicketPriceDetailsRepository;
@@ -43,8 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TicketDistributionService.class, DistanceCalculator.class, JourneyTicketsAmqp.class})
+@SpringApplicationConfiguration(classes = {TicketDistributionService.class, GoogleMapsDistanceCalculator.class, JourneyTicketsAmqp.class})
 @WebAppConfiguration
+@PropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class IntegrationTest {
 
@@ -107,12 +109,12 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
-                .andExpect(jsonPath("$.totalPrice", equalTo(6.0)))
+                .andExpect(jsonPath("$.totalPrice", equalTo(1.92)))
                 .andExpect(jsonPath("$.ticketId", equalTo(1)));
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
         assertEquals(new Long(1), ticketPriceDetails.getId());
-        assertEquals(new BigDecimal("6.00"), ticketPriceDetails.getPrice());
+        assertEquals(new BigDecimal("1.92"), ticketPriceDetails.getPrice());
 
         mockMvc.perform(
                 post("/ticket/payment")
@@ -122,7 +124,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
-                .andExpect(jsonPath("$.totalPrice", equalTo(6.0)));
+                .andExpect(jsonPath("$.totalPrice", equalTo(1.92)));
 
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 0);
     }
@@ -139,13 +141,13 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
-                .andExpect(jsonPath("$.totalPrice", equalTo(1.0)))
+                .andExpect(jsonPath("$.totalPrice", equalTo(1.42)))
                 .andExpect(jsonPath("$.ticketId", equalTo(1)));
 
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
         assertEquals(new Long(1), ticketPriceDetails.getId());
-        assertEquals(new BigDecimal("1.00"), ticketPriceDetails.getPrice());
+        assertEquals(new BigDecimal("1.42"), ticketPriceDetails.getPrice());
     }
 
     @Test(expected = NestedServletException.class)
@@ -175,7 +177,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
                 .andExpect(jsonPath("$.totalPrice", equalTo(7.0)))
-                .andExpect(jsonPath("$.change", equalTo(1.0)));
+                .andExpect(jsonPath("$.change", equalTo(5.08)));
 
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 0);
     }

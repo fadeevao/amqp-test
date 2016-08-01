@@ -2,7 +2,7 @@ package test_amqp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import test_amqp.calculator.DistanceCalculator;
+import test_amqp.calculator.GoogleMapsDistanceCalculator;
 import test_amqp.calculator.PriceCalculator;
 import test_amqp.calculator.PriceRequestInternal;
 import test_amqp.entities.TicketPriceDetails;
@@ -16,13 +16,13 @@ import java.math.BigDecimal;
 public class TicketDistributionService {
 
     @Autowired
-    private DistanceCalculator distanceCalculator;
+    private GoogleMapsDistanceCalculator googleMapsDistanceCalculator;
 
     @Autowired
     private TicketPriceDetailsRepository ticketPriceDetailsRepository;
 
-    public TicketDistributionService(DistanceCalculator distanceCalculator) {
-        this.distanceCalculator = distanceCalculator;
+    public TicketDistributionService(GoogleMapsDistanceCalculator distanceCalculator) {
+        this.googleMapsDistanceCalculator = distanceCalculator;
     }
 
     public TicketDistributionService() {}
@@ -42,7 +42,7 @@ public class TicketDistributionService {
 
     private BigDecimal calculatePriceBasedOnDistanceAndTicketType(TicketRequest ticketRequest) {
         JourneyDirections journeyDirections = ticketRequest.getJourneyDirections();
-        BigDecimal distance = distanceCalculator.calculateDistance(journeyDirections.getFrom(), journeyDirections.getTo());
+        BigDecimal distance = googleMapsDistanceCalculator.calculateDistance(journeyDirections.getFrom(), journeyDirections.getTo());
         PriceRequestInternal priceRequestInternal = PriceRequestInternal.PriceRequestInternalBuilder.aPriceRequestInternal()
                 .withStudentPrice(ticketRequest.isStudentTicket())
                 .withDistance(distance)
