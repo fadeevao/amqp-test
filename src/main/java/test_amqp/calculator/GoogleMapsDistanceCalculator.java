@@ -27,16 +27,18 @@ public class GoogleMapsDistanceCalculator {
 
         GeoApiContext context = new GeoApiContext().setApiKey(apiKey);
         String[] origins = new String[]{
-                stringBuilder.append(from.toString())
+                stringBuilder.append(from.getName())
                         .append(" , ")
-                        .append(country).toString()
+                        .append(country)
+                        .toString()
         };
 
         stringBuilder = new StringBuilder();
         String[] destinations = new String[]{
-                stringBuilder.append(to.toString())
+                stringBuilder.append(to.getName())
                         .append(" , ")
-                        .append(country).toString()
+                        .append(country)
+                        .toString()
         };
         DistanceMatrix matrix =
                 null;
