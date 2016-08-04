@@ -28,6 +28,7 @@ import test_amqp.api.TicketRequestController;
 import test_amqp.calculator.GoogleMapsDistanceCalculator;
 import test_amqp.entities.TicketPriceDetails;
 import test_amqp.exception.TicketReferenceNotFoundException;
+import test_amqp.model.Direction;
 import test_amqp.repos.TicketPriceDetailsRepository;
 
 import java.io.IOException;
@@ -60,7 +61,11 @@ public class IntegrationTest {
     @Autowired
     MessageConverter messageConverter;
 
+    @Mock
+    GoogleMapsDistanceCalculator googleMapsDistanceCalculator;
+
     @Autowired
+    @InjectMocks
     TicketDistributionService ticketDistributionService;
 
     @Autowired
@@ -81,7 +86,6 @@ public class IntegrationTest {
         Mockito.when(template.sendAndReceive(eq("request"), any(Message.class))).thenAnswer(new Answer() {
             public Object answer(InvocationOnMock invocation) throws Exception {
                 Object[] args = invocation.getArguments();
-                Object mock = invocation.getMock();
                 return ticketRequestProcesor.receiveTicketRequestAndProcess((Message)args[1]);
             }
         });
@@ -89,10 +93,10 @@ public class IntegrationTest {
         Mockito.when(template.sendAndReceive(eq("payment"), any(Message.class))).thenAnswer(new Answer() {
             public Object answer(InvocationOnMock invocation) throws Exception {
                 Object[] args = invocation.getArguments();
-                Object mock = invocation.getMock();
                 return ticketRequestProcesor.receivePaymentAndGenerateTicket((Message)args[1]);
             }
         });
+        Mockito.when(googleMapsDistanceCalculator.calculateDistance(any(Direction.class), any(Direction.class))).thenReturn(new BigDecimal("10.0"));
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
         ticketPriceDetailsRepository.deleteAll();
     }
@@ -109,12 +113,12 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
-                .andExpect(jsonPath("$.totalPrice", equalTo(1.92)))
+                .andExpect(jsonPath("$.totalPrice", equalTo(6.0)))
                 .andExpect(jsonPath("$.ticketId", equalTo(1)));
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
         assertEquals(new Long(1), ticketPriceDetails.getId());
-        assertEquals(new BigDecimal("1.92"), ticketPriceDetails.getPrice());
+        assertEquals(new BigDecimal("6.00"), ticketPriceDetails.getPrice());
 
         mockMvc.perform(
                 post("/ticket/payment")
@@ -124,7 +128,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
-                .andExpect(jsonPath("$.totalPrice", equalTo(1.92)));
+                .andExpect(jsonPath("$.totalPrice", equalTo(6.0)));
 
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 0);
     }
@@ -141,13 +145,13 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.ticketType", is("RETURN")))
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
-                .andExpect(jsonPath("$.totalPrice", equalTo(1.42)))
+                .andExpect(jsonPath("$.totalPrice", equalTo(5.0)))
                 .andExpect(jsonPath("$.ticketId", equalTo(1)));
 
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 1);
         TicketPriceDetails ticketPriceDetails = ticketPriceDetailsRepository.findAll().iterator().next();
         assertEquals(new Long(1), ticketPriceDetails.getId());
-        assertEquals(new BigDecimal("1.42"), ticketPriceDetails.getPrice());
+        assertEquals(new BigDecimal("5.00"), ticketPriceDetails.getPrice());
     }
 
     @Test(expected = NestedServletException.class)
@@ -177,7 +181,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.journeyDirections.to", is("HOVE")))
                 .andExpect(jsonPath("$.journeyDirections.from", is("BRIGHTON")))
                 .andExpect(jsonPath("$.totalPrice", equalTo(7.0)))
-                .andExpect(jsonPath("$.change", equalTo(5.08)));
+                .andExpect(jsonPath("$.change", equalTo(1.0)));
 
         assertEquals(((Collection< TicketPriceDetails>)ticketPriceDetailsRepository.findAll()).size(), 0);
     }

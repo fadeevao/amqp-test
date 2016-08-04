@@ -20,7 +20,7 @@ public class DistanceCalculatorTest {
 
     /*
     The purpose of this test is to not test the google API, but to check that there is no exception thrown when a name
-    of the town is spelt in  the way I've done it 
+    of the town is spelt in  the way I've done it
      */
     @Test
     public void test() {
